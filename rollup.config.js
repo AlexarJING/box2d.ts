@@ -1,14 +1,40 @@
-import typescript from "rollup-plugin-typescript2";
+// rollup.config.js
+import resolve from '@rollup/plugin-node-resolve';
+import commonjs from '@rollup/plugin-commonjs';
+import dts from "rollup-plugin-dts";
+import typescript from '@rollup/plugin-typescript';
+// import typescript from '@rollup/plugin-typescript';
 
-export default {
-  input: "src/index.ts",
-  output: {
-    file: "./dist/box2d.umd.js",
-    name: "b2",
-    format: "umd",
-    sourcemap: true
+export default [
+  // 主打包配置
+  {
+    input: 'src/index.ts',
+    output: [
+      {
+        dir: 'dist',
+        format: 'es', // 生成 mjs 文件
+        entryFileNames: '[name].mjs'
+      }
+    ],
+    // dir: {
+    //   outDir: "dist"
+    // },
+    plugins: [
+      typescript({outDir:"dist"}),
+      resolve(),
+      commonjs(),
+    ]
   },
-  plugins: [
-    typescript({ clean: true, tsconfigOverride: { compilerOptions: { target: "ES2015", module: "ES2015", declaration: false } } }),
-  ]
-};
+  // 类型定义生成配置
+  {
+    input: 'src/index.ts',
+    output: {
+      dir: 'dist',
+      format: 'es', // 生成 d.ts 文件
+      entryFileNames: '[name].d.ts'
+    },
+    plugins: [
+      dts({ insertTypesEntry: true })
+    ],
+  }
+];
